@@ -1,0 +1,189 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\bullet}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+\newcommand{\sol}{\begin{center}\textbf{SOLUTION}\end{center}} 
+% document specific stuff
+
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  % \printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 1}
+\author{Patrick Canny}
+\date{Due: 2019-01-29}
+\maketitle
+\section {Book Problems}
+\begin{questions}
+  \question Exercise 1.3\\
+  Prove that there is no algorithm that determines, for given Turing machine and 
+  input string, whether the machine terminates at that input or not.\\
+  \sol
+  \begin{claim} The above assertion holds, i.e. there is no algorithm to determine
+    whether or not a machine halts for a given input.
+  \end{claim}
+  \begin{claimproof}
+  Towards a contradiction, we assume that such an algorithm does exist. This 
+  algorithm would be defined as $f(\cl{M}, i)$ where $\cl{M}$ is a Turing Machine
+  and $i$ is the given input string. $f$ will then return "1" if the machine halts
+  on input $i$ and "0" otherwise.\\
+
+  For $f$ to return, it must simulate the execution of $\cl{M}$ on input $i$
+  and determine the result. However, if $\cl{M}$ does not halt, the execution
+  of $f$ will not terminate. Since $f$ must terminate and return an answer, 
+  this is a contradiction of the assumption above, proving that no such algorithm
+  exists.\\
+  \end{claimproof}
+\end{questions}
+%----------------------------------------------------------------------------}}}
+\section {Additional Problems}
+\begin{questions}
+% turing machines   {{{1
+% ID: Ugoxae2s
+\question Write a Turing machine that takes as input a binary number $a$ (a
+string in ``0'' and ``1'') and outputs $a-1$ (in binary). Be careful to
+specify the alphabet and all instructions.
+\sol
+Here is the specification of a Turing machine that decrements a binary number:
+  \begin{align*}
+    S =& \{0, 1, \_\}\\ 
+    A =& \{0, 1\} \\ 
+    Q =& \{q_0, q_1, q_2\} \\
+    \delta(q_0, 1) =& (q_0, 1, 1) \quad \delta(q_0, 0) = (q_0, 0, 1) \quad \delta(q_0,\_) = (q_1, \_, -1) \\
+    \delta(q_1,0)  =& (q_1, 1, -1) \quad \delta(q_1,1) = (q_2, 0, -1) \\
+    \delta(q_2,0)  =& (q_2, 0, -1) \quad \delta(q_2,1) = (q_2, 1, -1) \\
+  \end{align*}
+This machine is built with a few assumptions in mind:
+  \begin{itemize}
+    \item If the machine receives the number 0, it will return the maximum number
+      for a binary number the length of the input. I.e., the machine operates in
+      a number system modulo $2^n$ where $n$ is the length of the input.
+    \item The machine only works on positive binary numbers.
+    \item Assume that initially the head of the Turing machine is pointed at the 
+      first character of the input string.
+  \end{itemize}
+%----------------------------------------------------------------------------}}}1
+% turing machines   {{{1
+% ID: Eij9zae5
+\question Let $\ds{ \cl{T} = \Big\{ \cl{M} \mid \cl{M} \text{ is a Turing
+machine} \Big\} }$.
+
+Find a function $f: \cl{T} \to \NN$ such that if $\cl{N}$ and $\cl{M}$ are
+Turing machines and $f(\cl{N}) = f(\cl{M})$ then $\cl{N} = \cl{M}$ (that is,
+$\cl{N}$ and $\cl{M}$ have the same alphabet, same transition function,
+etc.).
+\sol
+This problem seems a little tricky, since I don't think it is enough to check if 
+two Turing machines accept the same language. You could have a number of Turing 
+machines that accept the same language, but do not have the same transition 
+function.\\
+
+In order to solve this problem, we will need to find an $f$ where $f$ is a 
+bijection($f$ is "one-to-one" and "onto"). This is more straightforward to do,
+since we can use the fact that $\cl{T}$ is countable.\\
+
+$f$ will convert the input Turing machine into a binary representation. This is
+possible, since all Turing machines can be encoded as binary strings. Then,
+$f$ would take this string encoding, and return the natural number associated
+with that encoding. This is assuming that all of the Turing machines have been 
+previously enumerated in this way.\\
+
+To show then that $f$ is a bijection, we must establish a diagonalizable matrix.\\
+
+To do this is straightforward: establish the columns as $f(\cl{M})$ and the rows 
+as the numbers of $\NN$. Then, mark a $1$ in the row corresponding to the output
+of $f$. This matrix will be a diagoinal, square matrix, since the Turing machines
+were assumed to be enumerated with $\NN$. The matrix will then look as follows:
+  \[
+      I =
+      \begin{bmatrix}
+      1 & & \\
+      & \ddots & \\
+      & & 1
+      \end{bmatrix}
+  \]
+Since this matrix is diagonal, it shows that $f$ is a bijection, meaning that it
+is a valid function for this problem.\\
+
+Then, $f$ can be defined explicity as follows:\\
+
+$f(\cl{M})$:
+\begin{itemize}
+  \item convert $\cl{M}$ into it's unique binary encoding, call it $b$.
+  \item convert $b$ into its proper numerical representation in $\NN$, call it $n$.
+  \item return $n$
+\end{itemize}
+%----------------------------------------------------------------------------}}}1
+\end{questions} \end{document}

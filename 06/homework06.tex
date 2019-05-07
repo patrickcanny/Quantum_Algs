@@ -1,0 +1,277 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usepackage{stackengine}
+
+\usetikzlibrary{quantikz, arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\bullet}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\bvect}[1]{ \left< #1 \right| }
+\newcommand{\kvect}[1]{ \left| #1 \right> }
+\newcommand{\bracket}[2]{ \left< #1 \mid #2 \right> }
+\newcommand\ooplus{\stackMath\mathbin{\stackinset{c}{0ex}{c}{0ex}{\oplus}{\bigcirc}}}
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  
+\printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 6 Solutions}
+\author{Patrick Canny}
+\date{Due: 2019-03-19}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+\section{Book Problems}
+\begin{questions}
+  \question Exercise 7.1\\
+  Prove that negation and the Toffoli gate form a complete basis for reversible
+  circuits.
+  \begin{solution}
+    \begin{claim} The assertion of Problem 7.1 is true.
+      \begin{claimproof}
+        To prove that a basis is complete, we've generally considered bases that
+        are known to be complete and then shown that that basis can be created
+        from elements of the new basis. The procedure here will be similar, 
+        but reversibility will need to be considered.\\
+
+        Take the complete boolean basis $\{\neg, \wedge\}$. From Lemma 7.1
+        (page 62 in the text)it is possible to create permutations 
+        for the elements of the basis, allowing realizations of the 
+        following mappings:
+        \begin{align*}
+          \neg_{\oplus} &: (x, y) \mapsto (x, x \oplus y \oplus 1)\\
+          \wedge_{\oplus} &: (x, y, z) \mapsto (x, y, z \oplus xy) \\
+          \ooplus &: (x, y) \mapsto (x, x\oplus y) \\
+        \end{align*}
+        By Lemma 7.1, these functions form a complete basis for reversible 
+        boolean circuits. From here, we need to show that this basis can be 
+        represented using only
+        the Toffoli gate and negation. Fortunately, the Toffoli gate is already
+        present in this new basis. It is now required to show that the other two
+        functions can be represented using the Toffoli and negation.\\
+
+        The permuted not, $\neg_{\oplus}$, can actually be formed using the 
+        controlled not and negation in the following way:
+        \begin{align*}
+          \neg_{\oplus}[1,2] 
+          &= \neg[2]\ooplus[1,2]
+        \end{align*}
+        So, if it is possible to show that the controlled not, $\ooplus$, can
+        be realized using the Toffoli and negation, it suffices to prove 
+        the claim. Fortunately, due to Lemma 7.2(page 63), it is possible 
+        to introduce
+        ancillary bits, which allows the realization of $\ooplus$. 
+        Take new ancillary bit $n$ and use it to realize $\ooplus[1,2]$, 
+        for instance:
+        \begin{align*}
+          \ooplus[1,2] &= \neg[n] \wedge_{\oplus}[n,1,2]\neg[n]
+        \end{align*}
+        Since we have represented the elements of a complete basis for reversible
+        boolean circuits using the Toffoli and Negation, this proves that
+        $\{\wedge_{\oplus}, \neg\}$ is a complete basis for revesible boolean
+        circuits as well.
+      \end{claimproof}
+    \end{claim}
+  \end{solution}
+  \question Exercise 8.2\\
+  Prove that any operator of the form $\Lambda(U), U \in U(\cl{B})$ can be
+  realized (without ancillas) by a constant size circuit over the basis of 
+  one-qubit gates and the gate $\Lambda(\sigma^x)$.
+  \begin{solution}
+    First, take $U = e^{i\phi}Z$ where $Z \in SU(2)$. The reason that this is done
+    is that this allows for elements in the group $U$ to be easily decomposed 
+    into elements in $SU$.\\
+
+    So, $\Lambda(U) = 
+    \Lambda(e^{i\phi})\Lambda(Z)$. The first part ($\Lambda(e^{i\phi})$) will
+    act only on the control qubit, so the second piece is more significant as
+    it acts on the operator that belongs to the Special Unitary Group.\\
+
+    Any operator $Z \in SU(2)$ can be represented as
+    \begin{align*}
+      Z = A\sigma^xA^{-1}B\sigma^xB^{-1} \qquad A, B \in SU(2)
+    \end{align*}
+    This is due to the geometric properties of these operators. This representation
+    is representative of 2 consecutive rotations being applied. For example,
+    the $A$ operator represents some modified rotation about the $y$ axis, whie
+    the $B$ operator represents a vertical rotation. This is due to the fact that
+    applying an operator (such as $A$) to $\sigma^x$ yields operator $\sigma^x*$. When
+    this new operator is applied to an input qubit, the resulting position on the Bloch
+    sphere represents the result of the desired operations being performed on the input. 
+    The reason that two of these transformations must be applied
+    is that with two rotations of varying degree, any position on the Bloch sphere
+    can be accessed.\\
+
+    From here this produces circuit\\
+    \begin{center}
+    \begin{tikzcd}
+      & \qw & \ctrl{1} & \qw & \qw & \ctrl{1} & \qw &\\
+      & \gate{A} & \gate{\sigma^x} & \gate{A^{-1}} & \gate{B} & 
+      \gate{\sigma^x} & \gate{B^{-1}} &
+    \end{tikzcd}
+    \end{center}
+    which follows from the above explanations: the input qubit is being applied at
+    both of the $\sigma^x*$ gates in the circuit.
+  \end{solution}
+  \question Exercise 8.4\\
+  Suppose that a unitary operator $U: \cl{B}^{\otimes{n}}\rightarrow\cl{B}^
+  {\otimes{n}}$ satisfies the condition $U\kvect{0} = \kvect{0}$. Construct a 
+  circuit of size $6n+1$ realizing $\Lambda(U)$ over the basis $\{U, 
+  \Lambda^2(\sigma^x)\}$, using ancillas. The gate $U$ need only be applied 
+  once.\\ 
+  \begin{solution}
+    To do this, we will implement an $n$-qubit controlled exchange. This can
+    be done by consindering the definition of a bit exchange given in the text:
+    \[
+      (\leftrightarrow)[j,k] = \ooplus[j,k]\ooplus[k,j]\ooplus[j,k]
+    \]
+    By the definition of $\Lambda^2(\sigma^x)$ (from here referred to as 
+    $\Lambda_\oplus$), it follows that we can extrapolate this definition:
+    \[
+      (\leftrightarrow)[j,k] = \Lambda_\oplus[j,k]\Lambda_\oplus[k,j]\Lambda_\oplus[j,k]
+    \]
+    Now, in order to introduce control to the equation, another qubit must be
+    added. This allows for the qubits to be swapped if the control is hi, and
+    leaves them be if the control is lo. With qubits $a,b$ and control qubit $c$,
+    the definition of the controlled bit exchange is as follows:
+    \[
+      (\leftrightarrow)[c, a, b] = \Lambda_\oplus[c, a, b]\Lambda_\oplus[c,b, a]
+      \Lambda_\oplus[c, a, b]
+    \]
+    So, for an $n$-qubit input, by the equation above, there will be $3n$ many
+    applications of $\Lambda_\oplus$ required to exchange the input qubits. Then,
+    the gate $U$ will be applied to the exchanged input if the control qubit is hi,
+    and will not be applied if the control is lo. This is a constant addition of 
+    $1$ gate to the circuit. From here, the input must be exchanged back to its
+    original state. This is done with another $3n$ many applications of 
+    $\Lambda_\oplus$. So, the final size of this exchange circuit will be $6n+1$
+    many gates. 
+  \end{solution}
+\end{questions}
+%----------------------------------------------------------------------------}}}
+\section{Additional Problems}
+\begin{questions}
+% reversible computation   {{{1
+\question Suppose that $F:\{0,1\}^2 \to \{0,1\}^2$ is a reversible function.
+Prove that there are constants $a,b,c,d,e,f\in \{0,1\}$ such that
+\[
+  F(x,y)
+  = \big( ax\oplus by\oplus c, dx\oplus ey\oplus f \big)
+\]
+for all $x,y\in \{0,1\}$. Recall that we interpret multiplication and
+addition ($\oplus$) as taking place in $\ZZ/2\ZZ$ so that multiplication is
+bitwise ``and'' and addition is bitwise ``or''.
+\begin{solution}
+  \begin{claim} The assertion of AP 1 is  
+    true, and constants $a, b, c, d, e, f$
+    can be found
+    \begin{claimproof}
+      Since the output of $F$ is a 2-bit pair, and the structure given for computing
+      these two bits is the same, I will prove the assertion using only one bit,
+      but it is important to realize that the same can be done for the second bit.\\
+
+      First, consider the equation 
+      \[
+        G(x,y) = \big( ax\oplus by\oplus c\big)
+      \]
+      We seek to show that $G$ always has a solution, and that any version of $G$
+      can evaluate to either $0$ or $1$.
+      \begin{align*}
+        G(0,0) &= a0 + b0 + c = c\\ 
+        G(0,1) &= a0 + b + c = b + G(0,0) \rightarrow b = G(0,1) - G(0,0)\\
+        G(1,0) &= a + b0 + c = a + G(0,0) \rightarrow a = G(1,0) - G(0,0)\\
+        G(1,1) &= a + b + c = G(1,0) - G(0,0) + G(1,0) - G(0,0) + G(0,0)\\
+        &= G(1,0) + G(0,1) + G(0,0) 
+      \end{align*}
+      It's unclear that the last equation has a solution, but the solution
+      can be created when considering that all of these equations will evaluate
+      to some number in $\ZZ/x\ZZ$. Now, we can establish
+      \[
+        s = a + b + c \quad | \quad s,a,b,c \in \ZZ/2\ZZ
+      \]
+      Now, if $s$ is to be $1$, choose $a = s = 1, b = c = 0$. If $s$ is to 
+      be $0$, choose $s = b = 0, a = c = 1$. Since this equation is solvable,
+      its analog that computes the other bit is also solvable by the same rationale.
+      This is enough to show that the claim is true.
+    \end{claimproof}
+  \end{claim}
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+\end{questions} 
+\end{document}

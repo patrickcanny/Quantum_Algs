@@ -1,0 +1,369 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\circ}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\bra}[1]{ \left< #1 \right| }
+\newcommand{\ket}[1]{ \left| #1 \right> }
+\newcommand{\bracket}[2]{ \left< #1 \mid #2 \right> }
+\tikzset{gate-c/.style = {draw, circle, inner sep=0.25em}}
+\tikzset{gate-r/.style = {draw, rounded corners, rectangle}}
+\tikzset{control/.style = {draw, fill, circle, inner sep=0.1em}}
+
+\newcommand{\Tr}{\text{Tr}}
+\newcommand{\Prob}{\textbf{P}}
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  % 
+\printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 10 Solutions}
+\author{Patrick Canny}
+\date{Due: 2019-04-16}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+\begin{defn*}
+Let $\m{V}$ be a vector space and let $\m{A}, \m{B}\leq \m{V}$ be subspaces.
+\begin{itemize}
+  \item We say that $\m{A}$ is \emph{orthogonal} to $\m{B}$ and write $\m{A}
+    \perp \m{B}$ if for every $\ket{a}\in A$ and $\ket{b}\in B$ we have
+    $\bracket{a}{b} = 0$.
+  \item Define the \emph{orthogonal complement} to $\m{A}$ to be
+    $\ds{
+      \m{A}^{\perp}
+      = \Big\{ \ket{v} \mid \ket{v}\in V \text{ and } 
+        \bracket{a}{v} = 0 \text{ for all } \ket{a}\in A \Big\}.
+    }$
+  \item Define the \emph{sum} of $\m{A}$ and $\m{B}$ to be
+    $\ds{
+      \m{A} + \m{B}
+      = \Big\{ \ket{a} + \ket{b} \mid \ket{a}\in A, \ket{b}\in B \Big\}.
+    }$
+\end{itemize}
+\end{defn*}
+
+\begin{questions}
+% vector spaces   {{{1
+\question Let $\m{A}$ and $\m{B}$ be subspaces of $\m{V}$.
+\begin{parts}
+  \part Prove that $\m{A}^{\perp}$ is a subspace.
+  \begin{solution}
+    To prove this, we need to show that $\ket{a}\in\m{A}^{\perp}\in\m{V}$. To
+    do this we need to show that:
+    \begin{center}
+    \begin{itemize}
+      \item $\ket{a} + \ket{b} \in \m{A}^\perp\quad\forall\ket{a}, \ket{b} 
+        \in \m{A}^\perp$.
+      \item $\lambda\ket{a} \in \m{A}^\perp \quad\forall \ket{a} \in \m{A}^\perp, 
+        \lambda \in \mathbb{C}$
+      \item $\ket{0} \in \m{A}^\perp$
+    \end{itemize}
+    \end{center}
+    Let's start with addition:
+    \begin{claim}
+      $\ket{a} + \ket{b} \in \m{A}^\perp\quad\forall\ket{a}, \ket{b} 
+        \in \m{A}^\perp$.\\
+    \end{claim}
+    \begin{claimproof}
+      Take $\ket{a} \in \m{A}^\perp$ and $\ket{v} \in \m{V}$. By definition, 
+      $\bracket{a}{v} = 0$. Now if we take $\ket{b} \in \m{A}^\perp$ then 
+      $\bracket{b}{v} = 0$. This holds for all $\ket{v} \in \m{V}$. So:
+      \begin{align*}
+        (\ket{a} + \ket{b})&= \ket{a+b}\\ 
+        \bracket{a+b}{v} &= 0
+      \end{align*}
+    \end{claimproof}
+    Next, we can show that $\m{A}^\perp$ is closed under scalar multiplication.
+    \begin{claim}$\lambda\ket{a} \in \m{A}^\perp \quad\forall \ket{a} \in 
+      \m{A}^\perp, \lambda \in \mathbb{C}$
+    \end{claim}
+    \begin{claimproof}
+      Take $\ket{a}\in\m{A}^\perp$. By definition, $\bracket{a}{v} = 0\quad
+      \forall 
+      \ket{v}\in\m{V}$. Then:
+      \begin{align*}
+        \lambda \ket{a} &= \ket{\lambda a}\\
+        \therefore \bracket{\lambda a}{v} &= \lambda\bracket{a}{v} = 0
+      \end{align*}
+    \end{claimproof}
+    Finally, show that $\ket{0}\in\m{A}^\perp$
+    \begin{claim}$\ket{0}\in\m{A}^\perp$\end{claim}
+    \begin{claimproof}
+      \begin{align*}
+        \bracket{0}{v} &= 0 \quad \forall v \in \m{V}\\
+        \therefore \bracket{0}{a} &= 0 \quad \forall a \in \m{A}^\perp
+      \end{align*}
+      So, $\ket{0} \in \m{A}^\perp$.
+    \end{claimproof}
+  \end{solution}
+  \part Prove that $\m{A}+\m{B}$ is a subspace.
+  \begin{solution}
+    To prove this, we need to show that $\ket{a}\in\m{A}^{\perp}\in\m{V}$. To
+    do this we need to show that:
+    \begin{center}
+    \begin{itemize}
+      \item $\ket{a} + \ket{b} \in \m{A}+\m{B}\quad\forall\ket{a}, \ket{b} 
+        \in \m{A}+\m{B}$.
+      \item $\lambda\ket{a} \in \m{A}+\m{B}\quad\forall \ket{a} \in \m{A}+\m
+        {B}, 
+        \lambda \in \mathbb{C}$
+      \item $\ket{0} \in \m{A} + \m{B}$
+    \end{itemize}
+    \end{center}
+    Let's start with addition:
+    \begin{claim}
+      $\ket{a} + \ket{b} \in \m{A} + \m{B} \quad\forall\ket{a}, \ket{b} 
+        \in \m{A}+\m{B}$.\\
+    \end{claim}
+    \begin{claimproof}
+      Take $\ket{a} \in \m{A} + \m{B}$. It can be written as 
+      \[
+        \ket{x} + \ket{y}
+      \]
+      Similarly, given $\ket{b}$, it can be written as 
+      \[
+        \ket{x'} + \ket{y'}
+      \]
+      Then, consider $\ket{a} + \ket{b}$:
+      \begin{align*}
+        \ket{a}+\ket{b} &= (\ket{x}+\ket{y}) + (\ket{x'}+\ket{y'})\\
+        &= (\ket{x}+\ket{x'}) + (\ket{y}+\ket{y'})
+      \end{align*}
+      and since $\ket{x}+\ket{x'}\in\m{A}$ by definition (and similarly for
+      $\ket{y}+\ket{y'}\in\m{B}$), it holds that $\ket{a} + \ket{b} \in \m{A}
+      + \m{B}$.
+    \end{claimproof}
+    Next, we can show that $\m{A}+\m{B}$ is closed under scalar multiplication.
+    \begin{claim}$\lambda\ket{a} \in \m{A}+\m{B} \quad\forall \ket{a} \in 
+      \m{A}+\m{B}, \lambda \in \mathbb{C}$
+    \end{claim}
+    \begin{claimproof}
+      $\ket{a}$, by definition, can be written as $\ket{x}+\ket{y}$.
+      \[
+        \lambda\ket{a} = \lambda (\ket{x} +\ket{y}) = \lambda\ket{x}+\lambda\ket{y}
+      \]
+      and since $\m{A}, \m{B}$ are subspaces, they are closed under scalar 
+      multiplication, implying that $\lambda\ket{x} \in \m{A}, \lambda\ket{y} \in
+      \m{B}$. Therefore, $\lambda\ket{a}\in\m{A}+\m{B}$
+    \end{claimproof}
+    Finally, show that $\ket{0}\in\m{A} + \m{B}$
+    \begin{claim}$\ket{0}\in\m{A} + \m{B}$\end{claim}
+    \begin{claimproof}
+      $\ket{0}\in \m{A}, \m{B}$ since they are both subspaces. So:
+      \begin{align*}
+        \ket{0} + \ket{0} &= \ket{0}\\
+        \therefore \ket{0} &\in \m{A} + \m{B}
+      \end{align*}
+    \end{claimproof}
+  \end{solution}
+  \part Prove that $\dim(\m{A}) + \dim(\m{A}^{\perp}) = \dim(\m{V})$.
+  \begin{solution}
+    Consider the bases for $\m{A}\text{ and  }\m{A}^\perp$. Call them $\alpha$
+    and $\beta$, respectively. We want to show that
+    \[
+      \alpha \cup \beta = \{v_1,\hdots, v_k, w_1, \hdots, w_l\}
+    \]
+    is a valid basis for $\m{V}$ given that $v_i \in \alpha$ and $w_j \in \beta$.\\
+
+    Given $v\in \m{V}$, $v$ can be expressed as $v_1 + v_2 \quad v_1\in\m{A}, v_2
+    \in \m{A}^\perp$. $v_1, v_2$ can be represented as a linear combination of 
+    basis vectors. So:
+    \[
+      v = v_1 + v_2 = \sum_i \lambda_i \ket{v_i} + \sum_j \gamma_i 
+      \ket{w_j}
+    \]
+    which is an analog to showing that $\alpha \cup \beta$ acts as a basis for
+    $\m{V}$. Is $\alpha \cup \beta$ linearly independant? 
+  \end{solution}
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+% orthogonal projection   {{{1
+\question Let $\m{A}$ be a subspace of $\m{V}$ and let $\ket{v}\in V$.
+\begin{parts}
+  \part Show that $\Pi_\m{A} \ket{v}\in A$.
+  \begin{solution}
+    By definition, $\Pi_\m{A} = \sum_j \ket{e_j}\bra{e_j}$ where $e_j$ runs over
+    an orthonormal basis for $\m{A}$. So, we can re-write the sum as:
+    \begin{align*}
+      \Pi_\m{A} &= \big(\sum_j \ket{e_j}\bra{e_j}\big)\ket{v}\\
+      &= \sum_j \bracket{e_j}{v}\ket{e_j}\\
+      &= \sum_j \lambda \ket{e_j} = \lambda \sum_j \ket{e_j}\\
+      &= \lambda \ket{a}
+    \end{align*}
+    Where $\ket{a}\in\m{A}$. This is because, by the sum above, $\ket{a}$ is 
+    a linear combination of the basis vectors from $\m{A}$, a.k.a. a vector
+    in $\m{A}$.
+  \end{solution}
+  \part Show that $\ket{v} - \Pi_{\m{A}} \ket{v}\in A^{\perp}$.
+  \begin{solution}
+    $\ket{v}$ can be represented by $\ket{v_i} + \ket{v_j}$ given that 
+    $\ket{v_i} \in \m{A}$ and $\ket{v_j} \in \m{A}^\perp$. So, since $\Pi_\m{A}
+    \ket{v}\in\m{A}$, an arbitrary $\ket{v}\in\m{V}$ can be expressed as 
+    \[
+      \Pi_\m{A}\ket{v} + \ket{v_j} = \ket{v}
+    \]
+    Therefore, $\ket{v_j}\in\m{A}^\perp$.
+  \end{solution}
+  \part Explain why this justifies calling $\Pi_{\m{A}}$ the orthogonal
+    projection onto $\m{A}$.
+  \begin{solution}
+   $\Pi_\m{A}$ effectively extracts the perpendicular component of $\ket{v}$,
+    isolating it to a vector in the $\m{A}$ space.
+  \end{solution}
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+% quantum probability, orthogonality   {{{1
+\question Suppose that $\m{A}$ and $\m{B}$ are orthogonal to each other.
+\begin{parts}
+  \part What is $\dim(\m{A}+\m{B})$?
+  \begin{solution}
+    \[
+      \dim(\m{A} + \m{B}) = \dim(\m{A}) + \dim(\m{B})
+    \]
+    This is only possible since $\m{A} \perp \m{B}$. This fact implies that 
+    $\m{A}\cap\m{B} = {0}$, so their bases are disjoint.
+  \end{solution}
+  \part Show that $\Prob(\ket{v}, \m{A}+\m{B}) = \Prob(\ket{v}, \m{A}) +
+    \Prob(\ket{v}, \m{B})$.
+  \begin{solution}
+    Since $\m{A} \perp \m{B}$, the two event spaces are independant of one another.
+    In other words, this means that the probabilities of an event occuring in 
+    either of the two spaces are independant of each other. Because of this fact,
+    \begin{align*}
+      \Prob(\ket{v}, \m{A}+\m{B}) 
+      &= \bra{v}\Pi_{\m{A}+\m{B}}\ket{v}\\
+      &= \bra{v}\Pi_{\m{A}}+ \Pi_{\m{B}}\ket{v}\\
+      &= \bra{v}\Pi_{\m{A}}\ket{v} + \bra{v}\Pi_{\m{B}}\ket{v}\\
+      &= \Prob(\ket{v}, \m{A}) + \Prob(\ket{v},\m{B})\\
+    \end{align*}
+    \[
+      \Prob(\ket{v}, \m{A}+\m{B}) = \Prob(\ket{v}, \m{A}) +
+      \Prob(\ket{v}, \m{B})
+    \]
+  \end{solution}
+  \part Show that $\Pi_{\m{A}}\Pi_{\m{B}} = \Pi_{\m{B}}\Pi_{\m{A}}$.
+  \begin{solution}
+    \begin{align*}
+      &\Pi_\m{A} = \sum_i \ket{e_i}\bra{e_i}\quad e_i\in\cl{B}_\m{A}\\
+      &\Pi_\m{B} = \sum_j \ket{f_j}\bra{f_j}\quad f_j\in\cl{B}_\m{B}\\
+      &\Pi_{\m{A}}\Pi_{\m{B}} 
+      = \big(\sum_i \ket{e_i}\bra{e_i}\big)\big(\sum_j \ket{f_j}\bra{f_j}\big)\\
+      &= \sum_i\sum_j \ket{e_i}\bracket{e_i}{f_j}\bra{f_j}
+    \end{align*}
+    Because $\m{A} \perp \m{B}$, $\bracket{e_i}{f_j} = 0$,
+    which shows that $\Pi_\m{A}\Pi_\m{B} = \Pi_\m{B}\Pi_\m{A}$
+  \end{solution}
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+% quantum probability, tensors   {{{1
+\question Suppose that $\m{A}\leq \m{V}$ and $\m{B}\leq \m{W}$ are two
+subspaces. 
+\begin{parts}
+  \part Prove that $\Pi_{\m{A}\otimes \m{B}} = \Pi_{\m{A}}\otimes
+    \Pi_{\m{B}}$.
+  \begin{solution}
+    \begin{align*}
+      \Pi_{\m{A}\otimes \m{B}} 
+      &= \sum_{i,j}\ket{e_i\otimes f_j}\bra{e_i\otimes f_j}\quad e_i\in\m{A}, f_j\in\m{B}\\
+      &= \sum_{i,j}\ket{e_i}\otimes\ket{f_j} \bra{e_i} \otimes \bra{f_j}\\
+      &= \sum_{i,j}\ket{e_i}\bra{e_i}\otimes \ket{f_j} \bra{f_j}\\
+      &= \sum_{i}\ket{e_i}\bra{e_i}\otimes \sum_{j}\ket{f_j} \bra{f_j}\\
+      &= \Pi_{\m{A}}\otimes \Pi_{\m{B}}\\
+    \end{align*}
+  \end{solution}
+  \part Let $\rho$ and $\tau$ be density matrices. Prove that
+    $\Prob(\rho\otimes\tau, \m{A}\otimes \m{B}) =
+    \Prob(\rho,\m{A})\Prob(\tau,\m{B})$. You may use the fact that
+    $\Tr(X\otimes Y) = \Tr(X)\Tr(Y)$.
+  \begin{solution}
+    \begin{align*}
+      \Prob(\rho\otimes\tau, \m{A}\otimes \m{B}) 
+      &= \Tr(\rho\otimes\tau, \Pi_{\m{A}\otimes \m{B}})\\
+      &= \Tr(\rho\otimes\tau, \Pi_\m{A}\otimes \Pi_\m{B})\\
+      &= \Tr(\rho\Pi_\m{A}\otimes \tau\Pi_\m{B})\\
+      &= \Tr(\rho\Pi_\m{A})\Tr(\tau\Pi_\m{B})\\
+      &= \Prob(\rho,\m{A})\Prob(\tau,\m{B})\\
+  \end{align*}
+  \end{solution}
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+\end{questions} \end{document}

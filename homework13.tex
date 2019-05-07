@@ -1,0 +1,291 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\circ}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\bra}[1]{ \left< #1 \right| }
+\newcommand{\ket}[1]{ \left| #1 \right> }
+\newcommand{\bracket}[2]{ \left< #1 \mid #2 \right> }
+\tikzset{gate-c/.style = {draw, circle, inner sep=0.25em}}
+\tikzset{gate-r/.style = {draw, rounded corners, rectangle}}
+\tikzset{control/.style = {draw, fill, circle, inner sep=0.1em}}
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  
+\printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 13 Solutions}
+\author{Patrick Canny}
+\date{Due: 2019-05-07}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+\begin{questions}
+% phase estimation   {{{1
+\question Consider the component of the phase-estimation circuit below.
+\begin{center} \begin{tikzpicture}[font=\scriptsize, xscale=2]  % {{{
+  \tikzset{Usize/.style = {minimum size=3em}}
+  \path (0,0) node (r1) {$\ket{x_{n-1}}$}
+      ++(-5,0) node[control] (r1c) {}
+      ++(-1,0) node (r1end) {}
+        (r1)
+      ++(0,-0.75) node {$\vdots$}
+      ++(-2,0) node {$\vdots$}
+      ++(-2,0) node {$\vdots$}
+        (r1)
+      ++(0,-1.6) node (r2) {$\ket{x_2}$}
+      ++(-3,0) node[control] (r2c) {}
+      ++(-3,0) node (r2end) {}
+        (r2)
+      ++(0,-1) node (r3) {$\ket{x_1}$}
+      ++(-2,0) node[control] (r3c) {}
+      ++(-4,0) node (r3end) {}
+        (r3)
+      ++(0,-1) node (r4) {$\ket{x_0}$}
+      ++(-1,0) node[control] (r4c) {}
+      ++(-5,0) node (r4end) {}
+        (r4)
+      ++(0,-1.5) node (rpsi) {$\ket{\psi}$}
+      ++(-1,0) node[gate-c, Usize] (rpsiU0) {$U^{2^0}$}
+      ++(-1,0) node[gate-c, Usize] (rpsiU1) {$U^{2^1}$}
+      ++(-1,0) node[gate-c, Usize] (rpsiU2) {$U^{2^2}$}
+      ++(-1,0) node (rpsidots)[minimum size=5em] {$\cdots\cdots$}
+      ++(-1,0) node[gate-c, Usize] (rpsiUn) {$U^{2^{n-1}}$}
+      ++(-1,0) node (rpsiend) {};
+  \foreach \i/\o in {r1/r1end, r2/r2end, r3/r3end, r4/r4end, rpsi/rpsiU0,
+    rpsiU0/rpsiU1, rpsiU1/rpsiU2, rpsiU2/rpsidots, rpsidots/rpsiUn,
+    rpsiUn/rpsiend}
+  {
+    \draw[->] (\i) -- (\o);
+  }
+  \foreach \i/\o in {rpsiU0/r4c, rpsiU1/r3c, rpsiU2/r2c, rpsiUn/r1c}
+  {
+    \draw (\i) -- (\o);
+  }
+\end{tikzpicture} \end{center} % }}}
+This circuit is given formally as
+\[
+  \Upsilon(U)
+  = \prod_{r=0}^{n-1} \Lambda\big( U^{2^r} \big) \, [r, P],
+\]
+where $P$ is the register containing the vector $\ket{\psi}$ and the other
+registers are enumerated as in the diagram.
+
+\medskip
+
+For \emph{arbitrary} quantum state $\ket{\psi}$, show that
+\[
+  \Upsilon(U)(\ket{x}\otimes \ket{\psi}) 
+   = \ket{x}\otimes U^{\underline{x}} \ket{\psi},
+\]
+where $\underline{x}$ is the base-2 number corresponding to the bit string
+$\ket{x}$.
+\begin{solution}
+  \begin{align*}
+    \Upsilon(U)(\ket{x}\otimes \ket{\psi}) 
+    &=
+    \prod_{r=0}^{n-1}(\ket{x_r} \otimes U^{x_r * 2^r}\ket{\psi}) \\
+    &=
+    \prod_{r=0}^{n-1}\ket{x_r} \otimes \prod_{r=0}^{n-1}U^{x_r * 2^r}\ket{\psi}\\
+    &=
+    \ket{x_r} \otimes U^{\sum_{n=0}^{n-1} x_r * 2^r}\ket{\psi}\\
+    &=
+    \ket{x_r} \otimes U^{\underline{x}}\ket{\psi}\\
+  \end{align*}
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+% cloning   {{{1
+\question Let $\iota: \{0,1\} \to \{0,1\}$ be the identity function, defined
+by $\iota(x) = x$. The function $\iota_{\oplus}(x,y) = (x, x\oplus y)$ has
+the property that
+\[
+  \iota_{\oplus}(x,0)
+  = (x, x),
+\]
+meaning that it \emph{clones} the bit $x$ in the first register to the
+second register.
+
+\bigskip
+
+Let $\ket{\psi}\in \m{B}$ be an arbitrary 1-qubit quantum state. Show that
+\[
+  \widehat{\iota}_{\oplus}(\ket{\psi}\otimes \ket{0})
+  = \ket{\psi}\otimes \ket{\psi}
+\]
+if and only if $\ket{\psi} = \ket{0}$ or $\ket{\psi} = \ket{1}$. That is,
+the quantum operator ($\widehat{\iota}_{\oplus}$) corresponding to the
+classical 1-bit cloning operator ($\iota_{\oplus}$) fails to clone
+$\ket{\psi}$ unless $\ket{\psi}$ is in a state corresponding to a classical
+bit.
+\begin{solution}
+  Take generic vector $\ket{\psi} = \pmat{a\\b}$.
+  \begin{align*}
+    &\ket{\psi} \otimes \ket{0} = \pmat{a\\0\\b\\0}\\
+    &\widehat{\iota}_{\oplus} (\ket{\psi}) = 
+    \pmat{
+      1 & 0 & 0 & 0 \\
+      0 & 1 & 0 & 0 \\
+      0 & 0 & 0 & 1 \\
+      0 & 0 & 1 & 0 \\
+    }
+    \pmat{
+      a \\
+      0 \\
+      b \\
+      o
+    } = 
+    \pmat{
+      a \\
+      0 \\
+      0 \\
+      b \\
+    }\\
+  \end{align*}
+  Similarly,
+  \begin{align*}
+    \ket{\psi} \otimes \ket{\psi} = 
+    \pmat{
+      a^2\\
+      ab\\
+      ba\\
+      b^2\\
+    }
+  \end{align*}
+  So, for 
+  \[
+    \widehat{\iota}_{\oplus}(\ket{\psi}\otimes \ket{0})
+    = \ket{\psi}\otimes \ket{\psi}
+  \]
+  to hold:
+  \[
+    a = a^2, ab = ba = 0, b^2 = b
+  \]
+  So,
+  \begin{align*}
+    \ket{\psi} = (0 0), (1 0), (0 1)
+  \end{align*}
+  But $\pmat{0\\0}$ is not a valid quantum state, so $\ket{\psi} = 
+  \ket{0}, \ket{1}$.
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+% cloning   {{{1
+\question Let $U$ be a $2n$-qubit operator that \emph{clones} two $n$-qubit
+quantum states, $\ket{\phi}, \ket{\psi} \m{B}^{\otimes n}$, meaning
+\[
+  U(\ket{\phi}\otimes \ket{0^n}) = \ket{\phi}\otimes \ket{\phi}
+  \qquad\text{and}\qquad
+  U(\ket{\psi}\otimes \ket{0^n}) = \ket{\psi}\otimes \ket{\psi}.
+\]
+Prove that $U$ clones $\ket{\phi}$ and $\ket{\psi}$ if and only if
+$\ket{\phi} = \ket{\psi}$ or $\bracket{\phi}{\psi} = 0$. [\emph{Hint: take
+the inner product of the two equations.}]
+\begin{solution}
+  Considering the hint, we will examine the inner product of the above 
+  equations.
+  \begin{align*}
+    \bracket{U(\ket{\phi}\otimes \ket{0^n})}{U(\ket{\psi}\otimes \ket{0^n})}
+    &= \bra{\phi 0^n} U^\dagger U \ket{\psi 0^n}\\
+    &= \bracket{\phi \phi}{\psi \psi}\\ 
+    &= \bracket{\phi}{\psi} \bracket{0^n}{0^n} = \bracket{\phi}{\psi}\\
+  \end{align*}
+  From here, we can establish the following:
+  \begin{align*}
+    \bracket{\phi \phi}{\psi \psi} = \bracket{\phi}{\psi} 
+    &\Leftrightarrow
+    \bracket{\phi}{\psi} = 0 \text{ or } 1\\
+    &\Leftrightarrow \ket{\phi} = \ket{\psi} \text{ or } 
+    \ket{\phi} \perp \ket{\psi}
+  \end{align*}
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+% cloning   {{{1
+\question What does the previous question mean about the existence of a
+general cloning operators?
+\begin{solution}
+  The previous question implies that some general cloning operator cannot exist. 
+  In fact, the previous solution specifies a specific cloning operator. This 
+  operator implies that in order to clone a state, that state must be $\ket{0}$
+  or itself. The general operator applied to two distinct states would not be 
+  capable of cloning them unless they were both $\ket{0}$ or literally the same
+  state.
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+\end{questions} \end{document}

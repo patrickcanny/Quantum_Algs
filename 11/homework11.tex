@@ -1,0 +1,363 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\circ}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\bra}[1]{ \left< #1 \right| }
+\newcommand{\ket}[1]{ \left| #1 \right> }
+\newcommand{\bracket}[2]{ \left< #1 \mid #2 \right> }
+\tikzset{gate-c/.style = {draw, circle, inner sep=0.25em}}
+\tikzset{gate-r/.style = {draw, rounded corners, rectangle}}
+\tikzset{control/.style = {draw, fill, circle, inner sep=0.1em}}
+\DeclareMathOperator{\Tr}{Tr}
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  
+\printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 11}
+\author{Patrick Canny}
+\date{Due: 2019-04-23}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+
+\noindent
+Carefully read through the description of Simon's algorithm on pages 118 and
+119.
+
+\medskip
+
+\noindent
+Let $\m{G} = (\ZZ_2)^k$. Regarding elements of $\m{G}$ as $k$-dimensional
+vectors, we define
+\[
+  g\cdot h
+  = \sum_{i=1}^k g_ih_i \bmod 2
+\]
+to be the dot product modulo $2$. Furthermore, for a subgroup $\m{H}\leq
+\m{G}$ define
+\[
+  \m{H}^{\partial}
+  = \big\{ g\in G \mid g\cdot h = 0 \text{ for all } h\in H \big\}.
+\]
+
+\begin{questions}
+% Simon's algorithm   {{{1
+\question Explain each step in this calculation:
+\begin{align*}
+  \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot x - b\cdot y}
+  &= \sum_{d\in D} \sum_{x\in G} (-1)^{a \cdot d}(-1)^{(a-b)\cdot (x -_2 d)}
+  = \sum_{d\in D} \sum_{z\in G} (-1)^{a \cdot d}(-1)^{(a-b)\cdot z} \\
+  &= \left( \sum_{d\in D} (-1)^{a \cdot d} \right)
+    \left( \sum_{z\in G} (-1)^{(a-b)\cdot z} \right)
+\end{align*}
+[NB: the addition/subtraction in the exponent is the usual kind (not
+modulo 2) except for the ``$-_2$''.]
+\begin{solution}
+  I will break each step into a sub-calculation as follows:
+  \begin{parts}
+    \part
+    \begin{align*}
+      \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot x - b\cdot y}
+      &= \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot x - b\cdot y + 0}\\
+      &= \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot x - b\cdot y + (a\cdot y-
+      a\cdot y)}\\
+      &= \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot x - a\cdot y + (a\cdot y-
+      b\cdot y)}\\
+      &= \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot(x-y) + (a\cdot y-
+      b\cdot y)}\\
+      &= \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot(x-y) + (a-b)\cdot y}\\
+    \end{align*} 
+    Then, since $x-y=d, y = x-d$. So:
+    \begin{align*}
+      \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot(x-y) + (a-b)\cdot y}
+      &=\sum_{\stack{x,y\in G}{d\in D}} (-1)^{a\cdot(x-y) + (a-b)\cdot (x-d)}\\
+      &=\sum_{d\in D} \sum_{x\in G} (-1)^{a\cdot d + (a-b)\cdot (x-d)}\\
+    \end{align*}
+    Doing the subtraction $\mod 2$ ensures that the resulting vector will
+    be in $\m{G}$. This is because $\m{G}$ is only defined over $\{ 0, 1 \}^k$,
+    and doing the subtraction normally could result in negative components.
+    \part
+    $z$ must be in $\m{G}$, so it is possible to re-write the sum in terms of
+    $\m{G}$.
+    \part
+    By properties of summations, the double summation of a product can
+    be re-written as a product of two single summations.
+  \end{parts}
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+% Simon's algorithm   {{{1
+\question \begin{parts}
+  \part Prove that
+  $\ds{
+    \sum_{d\in D} (-1)^{a\cdot d} \neq 0
+  }$
+  if and only if $a\cdot d = 0$ for all $d\in D$.
+\begin{solution}
+  \begin{proof}
+    Towards a contradiction, assume that 
+    $\ds{
+      \sum_{d\in D} (-1)^{a\cdot d} \neq 0
+    }$
+    if and only if $a\cdot d \neq 0$ for all $d\in D$.\\
+    
+    Then, it holds that $a\cdot d = 1$ for some $d$.\\
+
+    From here, one of two things will happen:
+    \begin{itemize}
+      \item $a\cdot d = 1$ for all $d\in D$.\\
+        This cannot be true, since the identity operator in $D$ is $\ket{0}$,
+        and $a \cdot \ket{0} = 0$ for all $a$, so this is a contradiction. 
+      \item $a\cdot d = 1$ for some $d\in D$.\\
+        Take a partition of $D$ s.t the partitions are of equal size. This can
+        be done, since the subgroup $D$ could be selected in a way where the
+        following property holds for its partitions:
+        \begin{align*}
+          D_0 &= \{d \in D \quad | \quad a\cdot d = 0 \text{ for all } d\in D\}\\
+          D_1 &= \{d \in D \quad | \quad a\cdot d = 1 \text{ for all } d\in D\}
+        \end{align*}
+        Then, we can represent the original sum as the following:
+        \begin{align*}
+          \sum_{d\in D} (-1)^{a\cdot d} &= 
+          \sum_{g\in D_0} (-1)^{a\cdot g} + 
+          \sum_{e\in D_1} (-1)^{a\cdot e} \\
+          &=
+          \sum_{g\in D_0} (-1)^{0} + 
+          \sum_{e\in D_1} (-1)^{1} \\
+          &=
+          |D_0| - |D_1| = 0\\
+        \end{align*}
+        Because $D_0, D_1$ have equal size. This is a contradiction,
+        so the claim holds.
+    \end{itemize}
+  \end{proof}
+\end{solution}
+
+  \part Prove that
+  $\ds{
+    \sum_{z\in G} (-1)^{(a-b)\cdot z} \neq 0
+  }$
+  if and only if $a = b$.
+\begin{solution}
+  \begin{proof}
+    Towards a contradiction:
+    \begin{align*}
+      \sum_{z\in G} (-1)^{(a-b)\cdot z}
+      &= \sum_{z\in G} (-1)^{a\cdot z - b\cdot z} \\
+      &= \sum_{z\in G} (-1)^{a\cdot z} (-1)^{-b\cdot z} \\
+    \end{align*}
+    Now we can select $\ket{a},\ket{b}$ to aid in producing a contradiction.
+    Pick $a = \ket{0}, b = \ket{1}$. Note that $-b$ and $b$ produce the same 
+    result when -1 is raised to their power. Then:
+    \begin{align*}
+      \sum_{z\in G} (-1)^{a\cdot z} (-1)^{-b\cdot z} \\
+      \sum_{z\in G} (-1)^{1\cdot z}
+    \end{align*}
+    Now if we take $G$ to be ${0,1}^3$, the eight vectors in $G$ can be
+    used to show a contradiction:
+    \begin{align*}
+      (-1)^{1\cdot \ket{000}} + (-1)^{1\cdot \ket{001}} + \hdots + 
+      (-1)^{1\cdot \ket{111}} = 0
+    \end{align*}
+    This is because there are an equal number of times where the term being
+    added is $1$ and $-1$. Since $a\neq b$ and 
+    $\ds{
+      \sum_{z\in G} (-1)^{(a-b)\cdot z} = 0
+    }$
+    this is a contradiction.
+  \end{proof}
+\end{solution}
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+% Simon's algorithm   {{{1
+\question Prove the assertion on page 119 that
+$\ds{ 
+  \sum_{\stack{x,y\in G}{x-y\in D}} (-1)^{a\cdot x - b\cdot y} \neq 0
+}$
+if and only if $a=b\in D^{\partial}$ (the book uses $E^*$).
+\begin{solution}
+  \begin{proof}
+    This equation is comprised of the calculations shown in problem 2. 
+    By the previous problem, we can make a few observations:
+    \begin{itemize}
+      \item $a\in D^{\partial}$ by 2.(i) since $a\cdot d = 0$ for all $d\in D$.
+      \item Similarly, $b\in D^\partial$ since by 2.(ii) $a=b$
+      \item If either of the two summations in problem 2 equals 0, the whole
+        equation will evaluate to 0. Therefore, it is essential that both
+        summations do no equal 0, as shown in the previous problem.
+      \item The only way that this is possible is if $a=b\in D^\partial$ as
+        shown by item (i) and the previous problem.
+    \end{itemize}
+  \end{proof}
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+% Simon's algorithm   {{{1
+\question In Simon's algorithm, what would happen if instead of measuring
+the first block of qubits (the first $k$), we measured the second block of
+qubits (the last $n$)? Calculate the density matrix and describe what
+distribution it represents.
+\begin{solution}
+  By the form described in the text and lecture, $\rho$ can be represented as
+  follows:
+  \begin{align*}
+    \rho 
+    &= \Tr_1(U(\ket{\psi}\bra{\psi}\otimes\ket{0}\bra{0})U^\dagger)\\
+    &= \Tr_1(U(2^{-k/2}\sum_{x\in G} \ket{x} 2^{-k/2}\sum_{x\in G} \bra{x} 
+    \otimes\ket{0}\bra{0})U^\dagger)\\
+    &= 2^{-k}\Tr_1(U\big(\sum_{x\in G} \ket{x}\otimes\ket{0} 
+    \sum_{x\in G} \bra{x}\otimes \bra{0}\big)U^\dagger)\\
+    &= 2^{-k}\Tr_1(\big(\sum_{x\in G} \ket{x}\otimes\ket{f(x)} 
+    \sum_{x\in G} \bra{x}\otimes \bra{f(x)}\big))\\
+    &= 2^{-k}\Tr_1\big(\sum_{x,y\in G} \ket{x}\bra{y}\otimes \ket{f(x)} 
+    \bra{f(y)}\big)\\
+    &= 2^{-k}\big(\sum_{x,y\in G} \ket{f(x)}\bra{f(y)}\Tr_1(\ket{x}\bra{y})\big)\\
+    &= 2^{-k}\big(\sum_{x = y\in G} \ket{f(x)}\bra{f(y)}\\
+  \end{align*}
+  This comes from that $\ket{x}\bra{y}$ will produce a matrix with a singular
+  1 on the diagonal when x=y. Then:
+  \begin{align*}
+    \rho = 2^{-k}\sum_{x=y\in G} \ket{f(x)}\bra{f(y)}
+    &= 2^{-k}\sum_{x\in G} \ket{f(x)}\bra{f(x)}\\
+    &= 2^{-k}\sum_{x\in G} (-1)^{a\cdot f(x) - b\cdot f(y)}\\
+    &= 2^{-k}\sum_{x\in G} (-1)^{(a-b)\cdot f(x)}\\
+  \end{align*}
+  The final $\rho$ is then some matrix with mostly ones, but some places where 
+  larger values are found. This distribution seems to represent the distribution of
+  the predicted values for $f(x)$. 
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+% characters   {{{1
+\question We say that a subgroup $\m{H}\leq \m{G}$ is \emph{maximal} if
+\begin{itemize}
+  \item $H \neq G$ and
+  \item if $\m{H} \leq \m{X}\leq \m{G}$ then $\m{H} = \m{X}$ or $\m{X} =
+    \m{G}$.
+\end{itemize}
+Similarly, $\m{H}\leq \m{G}$ is \emph{minimal} if
+\begin{itemize}
+  \item $\{0\} \neq H$ and
+  \item if $\{0\} \leq \m{X}\leq \m{H}$ then $\{0\} = \m{X}$ or $\m{X} =
+    \m{H}$.
+\end{itemize}
+Prove that $\m{H}$ is maximal if and only if $\m{H}^{\partial}$ is minimal.
+\begin{solution}
+  \begin{proof}
+    Take $\m{H}^\partial$ to be minimal. The most simple minimal subgroup
+    is composed of $\{0\}$ and one other singleton. Call this additional 
+    element $a$. Then, $\m{H}^\partial$ is $\{0, a\}$. Then, the corresponding
+    group $\m{H}$ can be created by finding $(\m{H}^\partial)^\partial = \m{H}$.
+
+    This means that $H$ is defined by all the elements $g \in G$ where $g\cdot h
+    = 0 \quad \forall h \in H^\partial$. For $\{0\}$ this is simply all elements,
+    so the size of the group gets limited by $a$. If we take $a$ to be a simple
+    element of $G$, say that it's the vector $\ket{10\hdots0}$. From here, we
+    can see that all of the elements that make $a\cdot h = 0$ can be expressed
+    as vectors starting with $0$ and followed by $k-1$ many elements which may
+    be either 1 or 0, it doesn't matter. If we take $\m{H}$ to be all of these
+    elements, the final group will be maximal with size $|G|/2$.\\ 
+
+    Now take $\m{H}$ to be maximal. This means that $H^\partial$ is made of $g 
+    \in G$ where $g\cdot h = 0 \quad \forall h \in H$. Clearly, this 
+    $\m{H}^\partial$ must 
+    contain $0$, as $0\cdot h = 0$ for all $h \in H$. Now, what are the other
+    elements in this subgroup? If we have a maximal subgroup, we know that it 
+    does not have every element of the group. This maximal subgroup must also
+    be closed under addition. This implies that there is a maximal size of
+    a maximal subgroup, because with the addition of any single element, the
+    rest of the group must be included in order to retain the group properties.
+
+    When we consider the minimal subgroup as above, we can imagine the addition
+    of elements to this group to form a maximal subgroup. Whenever we add a new
+    element to the group, the sum of that new element and every other element in
+    the group must be added. This implies that each time a new element is added
+    to the group, the total number of elements in the group increases by $|H| 
+    - 1$ (since $0+a = a$). This means that the size of any maximal subgroup
+    is $|G|/2$\\
+
+    From here if it is possible to assume that if the elements of this maximal 
+    subgroup were selected in a particular way, it holds that there exists some
+    singleton $d$ such that $a\cdot d = 0$ for all $a$ in $\m{H}$. Since this
+    new group has only one element, it is minimal.
+  \end{proof}
+\end{solution}
+%----------------------------------------------------------------------------}}}1
+\end{questions} \end{document}

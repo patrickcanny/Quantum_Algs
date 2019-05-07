@@ -1,0 +1,459 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usepackage{tcolorbox}
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\bullet}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\bvect}[1]{ \left< #1 \right| }
+\newcommand{\kvect}[1]{ \left| #1 \right> }
+\newcommand{\bracket}[2]{ \left< #1 \mid #2 \right> }
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  % \printanswers
+\printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 5 Solutions}
+\author{Patrick Canny}
+\date{Due: 2019-03-05}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+\section{Book Problems}
+\begin{questions}
+  \question Exercise 6.5
+  \begin{parts}
+    \part Find $H[2]$.
+    \begin{solution}
+    The matrix representation of $H[2]$ is as follows: 
+    \[
+      \frac{1}{\sqrt{2}}
+      \pmat{
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} -1&0\\ 0&-1 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} -1&0\\ 0&-1 \end{smallmatrix}\\
+        }
+    \]
+    This can be derived using the following steps:
+    \begin{align*}
+      H[2] &= \frac{1}{\sqrt{2}}\big( I_{\cl{B}^{\otimes1}} \otimes H \otimes I_{\cl{B}^{\otimes1}}\big)\\
+           &= \frac{1}{\sqrt{2}}\pmat{ \pmat{1&0\\0&1} \otimes 
+              \pmat{1&1\\1&-1} \otimes \pmat{1&0\\0&1}}\\
+           &= \frac{1}{\sqrt{2}}\pmat{ 
+              \pmat{\begin{smallmatrix} 1&1\\1&-1\end{smallmatrix} & \begin{smallmatrix} 0&0\\0&0\end{smallmatrix}\\
+              \begin{smallmatrix} 0&0\\0&0\end{smallmatrix} & \begin{smallmatrix} 1&1\\1&-1\end{smallmatrix}}
+              \otimes
+              \pmat{1&0\\0&1}}\\
+           &= 
+      \frac{1}{\sqrt{2}}
+      \pmat{
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} -1&0\\ 0&-1 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 1&0\\ 0&1 \end{smallmatrix}&
+        \begin{smallmatrix} -1&0\\ 0&-1 \end{smallmatrix}\\
+        }
+    \end{align*}
+    \end{solution}
+    \part Find $U[3,1]$.
+    \begin{solution}
+    The matrix for $U[3, 1]$ can be represented as follows:
+    \[
+      \pmat{
+        \begin{smallmatrix} u_{00,00}&u_{00,10}\\ u_{10,00}&u_{10,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{00,01}&u_{00,11}\\ u_{10,01}&u_{10,11} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{00,00}&u_{00,10}\\ u_{10,00}&u_{10,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{00,01}&u_{00,11}\\ u_{10,01}&u_{10,11} \end{smallmatrix}\\
+        \begin{smallmatrix} u_{01,00}&u_{01,10}\\ u_{11,00}&u_{11,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{01,01}&u_{01,11}\\ u_{11,01}&u_{11,11} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{01,00}&u_{01,10}\\ u_{11,00}&u_{11,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{01,01}&u_{01,11}\\ u_{11,01}&u_{11,11} \end{smallmatrix}
+        }
+    \]
+    This is derived using the following procedure:\\
+
+    First, we define $U$:
+      \[
+        \pmat{
+          u_{00,00}&u_{00,01}&u_{00,10}&u_{00,11}\\
+          u_{01,00}&u_{01,01}&u_{01,10}&u_{01,11}\\
+          u_{10,00}&u_{10,01}&u_{10,10}&u_{10,11}\\
+          u_{11,00}&u_{11,01}&u_{11,10}&u_{11,11}\\
+        }
+        =
+        \pmat{v_{00}&v_{01}\\
+              v_{10}&v_{11}
+        }
+      \]
+      \begin{align*}
+        U[3,1] &= \pmat{1&0\\0&0}[3]*V_{00}[1] + 
+                  \pmat{0&1\\0&0}[3]*V_{01}[1] +
+                  \pmat{0&0\\1&0}[3]*V_{10}[1] +
+                  \pmat{0&0\\0&1}[3]*V_{11}[1] \\
+      \end{align*}
+      where $V_{ij}$ is selected as an individual $2x2$ matrix selected from the 
+      $4x4$ matrix for $U$ as defined. From here:
+      \begin{align*}
+          \pmat{1&0\\0&0}[3] &= \cl{I}_{\cl{B}^{\otimes2}}\otimes\pmat{1&0\\0&0}\\
+          &= \pmat{\begin{smallmatrix}1&0&0&0\\0&1&0&0\\0&0&1&0\\0&0&0&1\end{smallmatrix}&
+                   \begin{smallmatrix}0&0&0&0\\0&0&0&0\\0&0&0&0\\0&0&0&0\end{smallmatrix}\\
+                   \begin{smallmatrix}0&0&0&0\\0&0&0&0\\0&0&0&0\\0&0&0&0\end{smallmatrix}&
+                   \begin{smallmatrix}1&0&0&0\\0&1&0&0\\0&0&1&0\\0&0&0&1\end{smallmatrix}}
+      \end{align*}
+      Then, we compute $V_{00}[1]$.
+      \begin{align*}
+        V_{00}[1] &= \pmat{u_{00,00}&u_{00,01}\\u_{01,00}&u_{01,01}}\otimes \cl{I}_{\cl{B}^{\otimes2}}\\
+          &= \pmat{
+                   \begin{smallmatrix}u_{00,00}&0\\0&u_{00,00}\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{00,01}&0\\0&u_{00,01}\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{00,00}&0\\0&u_{00,00}\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{00,01}&0\\0&u_{00,01}\end{smallmatrix}\\
+                   \begin{smallmatrix}u_{01,00}&0\\0&u_{01,00}\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{01,01}&0\\0&u_{01,01}\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{01,00}&0\\0&u_{01,00}\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{01,01}&0\\0&u_{01,01}\end{smallmatrix}
+                }
+      \end{align*}
+      The two resulting matricies are then multiplied together, yielding
+      \begin{align*}
+                \pmat{
+                   \begin{smallmatrix}u_{00,00}&0\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{00,01}&0\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{00,00}&0\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{00,01}&0\\0&0\end{smallmatrix}\\
+                   \begin{smallmatrix}u_{01,00}&0\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{01,01}&0\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{01,00}&0\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                   \begin{smallmatrix}u_{01,01}&0\\0&0\end{smallmatrix}
+                }
+      \end{align*}
+      From here, a similar process is repeated for the remaining matricies, which yield
+      the following results:
+      \begin{align*}
+              \pmat{0&1\\0&0}[3]*V_{01}[1] &=
+                \pmat{
+                   \begin{smallmatrix}0&u_{00,10}\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                    \begin{smallmatrix}0&u_{00,11}\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                     \begin{smallmatrix}0&u_{00,10}\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                     \begin{smallmatrix}0&u_{00,11}\\0&0\end{smallmatrix}\\
+                       \begin{smallmatrix}0&u_{01,10}\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                     \begin{smallmatrix}0&u_{01,11}\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                     \begin{smallmatrix}0&u_{01,10}\\0&0\end{smallmatrix}&
+                   \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+                     \begin{smallmatrix}0&u_{01,11}\\0&0\end{smallmatrix}
+                }\\
+            \pmat{0&0\\1&0}[3]*V_{10}[1] &=
+      \pmat{
+        \begin{smallmatrix} 0&0\\ u_{10,00}&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+          \begin{smallmatrix} 0&0\\ u_{10,01}&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+          \begin{smallmatrix} 0&0\\ u_{10,00}&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+          \begin{smallmatrix} 0&0\\ u_{10,01}&0 \end{smallmatrix}\\
+            \begin{smallmatrix} 0&0\\ u_{11,00}&0\end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+          \begin{smallmatrix} 0&0\\ u_{11,01}&0\end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+          \begin{smallmatrix} 0&0\\ u_{11,00}&0\end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+          \begin{smallmatrix} 0&0\\ u_{11,01}&0\end{smallmatrix}
+        }\\
+        \pmat{0&0\\0&1}[3]*V_{11}[1] &= 
+      \pmat{
+        \begin{smallmatrix} 0&0\\ 0&u_{10,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&u_{10,11} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&u_{10,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&u_{10,11} \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&u_{11,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&u_{11,11} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&u_{11,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&u_{11,11} \end{smallmatrix}
+        }
+      \end{align*}
+      All of the resulting matricies are then summed, resulting in the final answer:
+    \[
+     U[3,1] =  
+     \pmat{
+        \begin{smallmatrix} u_{00,00}&u_{00,10}\\ u_{10,00}&u_{10,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{00,01}&u_{00,11}\\ u_{10,01}&u_{10,11} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{00,00}&u_{00,10}\\ u_{10,00}&u_{10,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{00,01}&u_{00,11}\\ u_{10,01}&u_{10,11} \end{smallmatrix}\\
+        \begin{smallmatrix} u_{01,00}&u_{01,10}\\ u_{11,00}&u_{11,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{01,01}&u_{01,11}\\ u_{11,01}&u_{11,11} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}\\
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{01,00}&u_{01,10}\\ u_{11,00}&u_{11,10} \end{smallmatrix}&
+        \begin{smallmatrix} 0&0\\ 0&0 \end{smallmatrix}&
+        \begin{smallmatrix} u_{01,01}&u_{01,11}\\ u_{11,01}&u_{11,11} \end{smallmatrix}
+        }
+    \]
+
+    \end{solution}
+  \end{parts}
+\end{questions}
+%----------------------------------------------------------------------------}}}
+\section{Additional Problems}
+\begin{questions}
+% inner product and tensor product {{{1
+\question Prove that the inner product and the tensor product commute:
+\[
+  \bracket{\alpha\otimes \beta}{\gamma\otimes \delta}
+  = \bracket{\alpha}{\gamma} \bracket{\beta}{\delta}.
+\]
+This is asserted on page 57 of the textbook.
+  \begin{solution}
+  \begin{claim} The inner product and tensor product commute.
+    \begin{claimproof}
+      \begin{align*}
+        \bracket{\alpha\otimes \beta}{\gamma\otimes \delta} 
+        &= \bracket{\sum_{j,k} \alpha_j\beta_k e_j \otimes f_k}
+        {\sum_{j,k} \gamma_j\delta_k e_j \otimes f_k} \qquad e_i, f_i \in \cl{B}^{\otimes n}\\
+        &= \sum_{jk} \alpha_j\beta_k e_j\otimes f_k \sum_{j,k} \gamma_j\delta_k e_j \otimes f_k\\
+        &= \sum_{jk} \alpha_je_j*\gamma_ke_k \otimes \beta_jf_j *\delta_k f_k\\
+        &= \bracket{\alpha}{\gamma}\otimes\bracket{\beta}{\delta}\\
+        &= \bracket{\alpha}{\gamma} \bracket{\beta}{\delta}
+      \end{align*}
+      The second simplification is possible due to the bilinear nature of the tensor peoduct. This allows
+      us to pair the $\alpha$ and $\gamma$ values with $e_i, e_k$, and likewise with $\beta, \delta,
+      f_j, f_k$.\\
+
+      The last simplification is possible because the $\alpha_je_j*\gamma_ke_k$ and the corresponding
+      $\gamma, \beta$ will all be 1-D matricies, meaning that their tensor product will just be scalar
+      multiplication, which yields the desired form.
+    \end{claimproof}
+  \end{claim}
+  \end{solution}
+%----------------------------------------------------------------------------}}}1
+
+% outer product and the linear transformation   {{{1
+\question Let $T: \m{A}\to\m{B}$ be a linear transformation between vector
+spaces with ordered bases
+\[
+  \cl{B}_{\m{A}}
+    = \big\{ \kvect{1}, \kvect{2}, \kvect{3} \big\}
+  \qquad\qquad
+  \cl{B}_{\m{B}}
+    = \big\{ \kvect{1}, \kvect{2} \big\}.
+\]
+Suppose that $T$ has matrix with respect to these bases
+\[
+  T
+  = \pmat{ 9  & 6  & -3 \\
+           -4 & -8 & 8 }.
+\]
+\begin{parts}
+  \part Show that the matrix for $T$ can be written
+  \[
+    T
+      = \sum_{\stack{ \kvect{j}\in \cl{B}_{\m{A}} }{ \kvect{i}\in \cl{B}_{\m{B}} }}
+      a_{ij} \kvect{i}\bvect{j}
+  \]
+  (note that $\kvect{1}\in \cl{B}_{\m{A}}$ is a 3-dimensional vector, while
+  $\kvect{1}\in \cl{B}_{\m{B}}$ is a 2-dimensional vector).
+  \begin{solution}
+    From the matrix above, we can construct the following:
+    \[
+      a_{11}\kvect{1}\bvect{1}+\ldots+a_{23}\kvect{2}\bvect{3}
+    \]
+    which can be expanded into:
+    \[
+      a_{11}\pmat{1&0&0\\0&0&0}+\ldots+a_{23}\pmat{0&0&0\\0&0&1}
+    \]
+    From here, the $a_{ij}$ can be chosen from the corresponding $ij$ position in the matrix 
+    $T$, since this will isolate the element at the given $ij$ position in the final matrix.
+  \end{solution}
+  \part Show that for fixed $\kvect{i}\in \cl{B}_{\m{A}}$ and $\kvect{j}\in
+  \cl{B}_{\m{B}}$
+  \[
+    \big( \kvect{j} \bvect{i} \big) \kvect{v}
+    = \bracket{i}{v} \kvect{j}
+  \]
+  for all $\bvect{v} \in \m{A}$. From this, prove that $\kvect{j}\bvect{i}$
+  defines a linear transformation from $\m{A}\to \m{B}$.
+  \begin{solution}
+  \begin{align*}
+    \big( \kvect{j} \bvect{i} \big) \kvect{v}
+    &= \big( \kvect{a} \bvect{b} \big) \kvect{v} \text{(relabel for ease of use)}\\
+    &= \big(  \pmat{a_i\\a_j} \pmat{b_i&b_j&b_k}\big) \pmat{v_0\\v_1\\v_2}\\
+    &= \pmat{a_i*b_i&a_i*b_j&a_i*b_k\\
+            a_j*b_i&a_j*b_j&a_j*b_k} \pmat{v_0\\v_1\\v_2}\\
+    &= \pmat{\sum_{x} a_i b_x v_x\\
+             \sum_{x} a_j b_x v_x}\\
+    &= \pmat{a_i(\sum_{x} b_x v_x)\\
+             a_j(\sum_{x} b_x v_x)}\\
+    &= \pmat{a_i \bracket{b}{v}\\
+             a_j \bracket{b}{v}}\\
+    &= \pmat{a_i \\ a_j}\bracket{b}{v}\\
+    &= \kvect{a}\bracket{b}{v}\\
+    &= \bracket{i}{v}\kvect{j} \text{(relabel)}
+  \end{align*}
+  This implies that $\kvect{j}\bvect{i}$ defines a linear transformation from $\m{A}\to \m{B}$, 
+  because $\bracket{i}{v}$ is a scalar, which is then multiplied by $\kvect{j}$, a vector in $\m{B}$.
+  Since the vector that this operator was applied to was originally in $\m{A}$, this is enough to 
+  show that this is a linear transformation from $\m{A} \to \m{B}$
+  \end{solution}
+  \part Suppose that
+  \[
+    R
+      = \sum_{\stack{ \kvect{j}\in \cl{B}_{\m{A}} }{ \kvect{i}\in \cl{B}_{\m{B}} }}
+      b_{ij} \kvect{i}\bvect{j}
+  \]
+  for $b_{ij}\in \CC$. Use the previous part to prove that $R$ is a linear
+  transformation from $\m{A}\to \m{B}$.
+  \begin{solution}
+    $R$ represents a matrix that is $\dim(\m{A})\times\dim(\m{B})$. By the previous part,
+    if any element from $\m{A}$ is applied to $R$, the resulting matrix will be filled
+    with elements from $\m{B}$ because the linear operator $\kvect{j}\bvect{i}$ is 
+    present at each index in $R$. This allows us to create a one-to-one mapping of
+    elements in $\m{A}$ to elements in $\m{B}$. 
+  \end{solution}
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+\end{questions} \end{document}

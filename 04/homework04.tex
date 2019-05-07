@@ -1,0 +1,371 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz, listings}
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+\usepackage[final]{hyperref}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\bullet}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\sol}{\begin{center}\textbf{SOLUTION}\end{center}} 
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  % \printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 4 Solutions}
+\author{Patrick Canny}
+\date{Due: 2019-02-26}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+\section {Book Problems}
+\begin{questions}
+  \question Exercise 6.2\\
+  \sol
+  \begin{claim} There is a unique linear map $C = A \otimes B: \cl{L} \otimes 
+    \cl{M} \rightarrow \cl{L}' \otimes \cl{M}'$ where $C(u \otimes v) = A(u) 
+    \otimes B(v)$ for any $u \in \cl{L}, v \in \cl{M}$.
+    \begin{claimproof} This problem seems closely tied with the universality 
+      principle for bilinear functions. We just need to find a way to convert 
+      this problem into a problem that can utilize the universality principle.
+      This principle states that there is a unique linear function $G: \cl{L}
+      \otimes \cl{M} \rightarrow \cl{F}$ such that $F(u,v) = G(u\otimes v)$
+      where $F$ is the original bilinear function.\\
+
+      From here we will try to create the universality function from the pieces
+      of the problem. Let $\cl{F} = \cl{L}' \otimes \cl{M}'$. Then, we will 
+      define functions in the context of this $\cl{F}$. Take $F: \cl{L} \times 
+      \cl{M} \rightarrow \cl{F}$ and $F(u, v) = A(u) \otimes B(v)$.\\
+
+      From here, if we subsititute our newly defined properties into $G$ from
+      the universality principle, we can see that we have formed a unique $C$
+      that aligns with the properties required by $C$. Since the universality
+      function notes that this function is unique, it holds that $C$ is also 
+      unique.
+    \end{claimproof}
+  \end{claim}
+\end{questions}
+%----------------------------------------------------------------------------}}}
+\section {Additional Problems}
+\begin{questions}
+% Miller-Rabin test   {{{1
+\question For each of the following values of $q$, generate 5 random members
+of $\{1,\dots,q-1\}$ and run the Miller-Rabin test using them. What is the
+probability that $q$ is prime?
+
+\smallskip
+
+I suggest using python as a calculator to solve these problems. You need not
+show the work required to exponentiate numbers.
+\sol
+Here is my Python implementation of the Miller-Rabin Primality Test:\\
+\begin{lstlisting}
+# Patrick Canny
+# EECS 700 H4
+# Miller-Rabin Primality Test Implementation
+
+import os
+import math
+import random
+
+def miller_rabin(q):
+    # if q even != 2 then composite
+    if(q % 2 == 0):
+        if (q == 2):
+            return "Prime"
+        return "Composite"
+    else:
+        r = 0
+        s = q-1
+        while s % 2 == 0:
+            r += 1
+            s //= 2
+        for _ in range(5):
+            a = random.randrange(2, q-1)
+            x = pow(a, s, q)
+            if x != 1:
+                i = 0
+                while (x != q-1):
+                    if i == r-1:
+                        return "Composite"
+                    else:
+                        i += 1
+                        x = (x ** 2) % q
+        return "Prime"
+
+print("Ex 1: {}".format(miller_rabin(10601)))
+print("Ex 2: {}".format(miller_rabin(101101)))
+print("Ex 3: {}".format(miller_rabin(15841)))
+\end{lstlisting}
+
+\begin{parts}
+  \part $q = 10601$: ``Prime'' (Probability = 1)
+  \part $q = 101101$: ``Composite'' (Probability $\geq 1/2$)
+  \part $q = 15841$: ``Composite'' (Probability $\geq 1/2$)
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+% linear algebra, bases, product of spaces   {{{1
+\question Let $\m{V}$ and $\m{S}$ be vector spaces over $\CC$ with bases
+$\cl{B}_{\m{V}}$ and $\cl{B}_{\m{S}}$, respectively. Define
+\[
+  \m{V}\times \m{S}
+  = \big\{ (v,s)\mid v\in V \text{ and } s\in S \big\}
+\]
+and recognize it as a vector space by \emph{coordinate-wise} interpretation
+of the vector space axioms. That is,
+\begin{align*}
+  &(v_1,s_1) + (v_2,s_2) = (v_1+v_2, s_1+s_2)                     && \text{for } v_1,v_2\in V \text{ and } s_1,s_2\in S, \\
+  &\lambda \cdot (v_1,s_1) = (\lambda\cdot v_1, \lambda\cdot s_1) && \text{for } v_1\in V, s_1\in S, \text{ and } \lambda\in \CC \text{ a scalar}.
+\end{align*}
+If $R: \m{A} \to \m{V}$ and $T:\m{A}\to \m{S}$ are linear functions, then
+we can define a linear function $(R\times T):\m{A} \to \m{V}\times
+\m{S}$ by
+\[
+  (R\times T)a = \big( Ra, Ta \big)
+  \qquad\text{for } a\in A.
+\]
+
+\begin{parts}
+  \part Let
+  \[
+    \cl{C}
+    = \big\{ (b_v,b_s) \mid b_v\in \cl{B}_{\m{V}} \text{ and } b_s\in
+      \cl{B}_{\m{S}} \big\}.
+  \]
+  Show that $\CC\text{-span}(\cl{C}) = \m{V}\times \m{S}$ but that $\cl{C}$
+  is \emph{not} a basis for $\m{V}\times \m{S}$.
+  \sol
+  Consider an element in $\CC\text{-span}(\cl{C})$. This element is some $\lambda_i*c_i$
+  given that $\lambda_i \in \CC$ and $c_i \in \cl{C}$. This is also to say that this 
+  element can be written as $\lambda_i*(b_v, b_s)$ by the definition of $\cl{C}$. By the
+  distributive property, this also can be expressed as the form 
+  $(\lambda_i*b_v, \lambda_i*b_s)$. This implies that we could have a number of the same
+  element of $\cl{B}_{\m{V}}$ or $\cl{B}_{\m{S}}$ in a corresponding representation
+  in $\m{V}\times \m{S}$. From here, we can represent an element of $\m{V}\times \m{S}$ 
+  as a linear combination of elements from $\cl{C}$ showing that $\CC\text{-span}
+  (\cl{C}) = \m{V}\times \m{S}$\\
+
+  Showing that $\cl{C}$ is not a basis for $\m{V}\times \m{S}$ requires showing that either
+  the elements of $\cl{C}$ are not linearly independant, or that the elements of $\cl{C}$ 
+  cannot compose all the elements of $\m{V}\times \m{S}$. The elements from $\cl{C}$ are 
+  all multiplied by scalars in their linear combinations that form $\m{V}\times \m{S}$,
+  which would mean that the scalar multiple could be changed from say $k$ to $2k$, meaning
+  that there would be multiple ways to make the $0$ vector, proving that $\cl{C}$ cannot
+  be a basis.\\
+  \part Prove that
+  \[
+    \cl{B}_{\m{V}\times \m{S}}
+    = \big\{ (b_v,0), (0,b_s) \mid b_v\in \cl{B}_{\m{V}} \text{ and } b_s\in
+    \cl{B}_{\m{S}} \big\}
+  \]
+  is a basis for $\m{V}\times \m{S}$. What is the dimension of $\m{V}\times
+  \m{S}$?
+  \sol
+  \begin{claim}
+    \[
+      \cl{B}_{\m{V}\times \m{S}}
+    = \big\{ (b_v,0), (0,b_s) \mid b_v\in \cl{B}_{\m{V}} \text{ and } b_s\in
+    \cl{B}_{\m{S}} \big\}
+    \]
+    is a basis for $\m{V}\times \m{S}$.
+    \begin{claimproof}
+      We need to show that all elements of $\m{V}\times \m{S}$ can be represented as a linear
+      combination of the elements of this given basis. The elements of the basis are 
+      definitely linearly independant, as there is only one single way to produce the $0$ 
+      vector (multiply each basis element by 0).\\
+
+      To show that all the linear combinations can be created, we can start with the fact
+      that we can build the entire basis for both $\m{S}$ and $\m{V}$ by adding $0*(b_v,0)$
+      or $0*(0, b_s)$ to all the other vectors that can be generated by choosing $b_v, b_s$.
+      It is now possible to build all vectors that belong to $\m{S}$ and $\m{V}$, so 
+      building the vectors in $\m{V} \times \m{S}$ is just a matter of creating linear 
+      combinations of the vectors that fill $\m{V}$ or $\m{S}$. This implies that the
+      size of $\m{V}\times \m{S}$ is the size of $\m{V}$ times the size of $\m{S}$
+    \end{claimproof}
+  \end{claim}
+  \part Let $R: \m{A} \to \m{V}$ and $T:\m{A}\to \m{S}$ be linear functions.
+  Suppose that $\m{A}$, $\m{V}$, and $\m{S}$ have ordered bases
+  \[
+    \cl{B}_{\m{A}}
+      = \big\{ a_1, a_2 \big\},
+    \qquad
+    \cl{B}_{\m{V}}
+      = \big\{ v_1, v_2, v_3 \big\},
+    \qquad
+    \cl{B}_{\m{S}}
+      = \left\{ s_1, s_2 \right\},
+  \]
+  and that the matrix representations of $R$ and $T$ relative to these bases
+  are
+  \[
+    (R)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{V}} }
+      = \bmat{ 1 & 2 \\
+               3 & 4 \\
+               5 & 6 }
+    \qquad\text{and}\qquad
+    (T)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{S}} }
+      = \bmat{ -1 &  2 \\
+                3 & -2 }.
+  \]
+  Using the lexicographic order for the basis $\cl{B}_{\m{V}\times \m{S}}$
+  (i.e.\ ordering by $\cl{B}_{\m{V}}$ first, and then $\cl{B}_{\m{S}}$),
+  find the matrix representation for $(R\times T)$ (that is, find $(R\times
+  T)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{V}\times \m{S}} }$).
+  \sol
+  To find $(R\times T)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{V}\times \m{S}} }$, we seek
+  to build a new matrix:\\
+  \[
+    (R\times T)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{V}\times \m{S}} }
+    = \bmat{(T)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{S}} }\\
+            (R)_{\cl{B}_{\m{A}}\to \cl{B}_{\m{V}} }}
+    = \bmat{-1 & 2\\
+            3 & -2\\
+            1 & 2\\
+            3 & 4\\
+            5 & 6 }
+  \]
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+% linear algebra, bases, tensor product   {{{1
+\question Let $\m{V}$ and $\m{S}$ be vector spaces over $\CC$ with bases
+$\cl{B}_{\m{V}}$ and $\cl{B}_{\m{S}}$, respectively. 
+
+\begin{parts}
+  \part Prove that
+  \[
+    \cl{B}_{\m{V}\otimes \m{S}}
+      = \big\{ b_v \otimes b_s \mid b_v\in \cl{B}_{\m{V}} \text{ and } b_s\in
+        \cl{B}_{\m{S}} \big\}
+  \]
+  is a basis of $\m{V}\otimes \m{S}$. What is the dimension of $\m{V}\otimes
+  \m{S}$?
+  \sol
+  \begin{claim} The above assertion is true.
+    \begin{claimproof}
+      Recall that to prove something is a basis, we need to show that there is exactly
+      one way to build the 0-vector, and that all vectors in the final vector space can
+      be represented as linear combinations of the elements of the basis.\\
+
+      First, let's write a compnenent of $\m{V}\otimes \m{S}$:
+      \[
+        \sum_{i,j} a_{ij} u_i \otimes v_j
+      \]
+      where $u_i, v_j \in \cl{B}_u, \cl{B}_v$ respectively. This form holds for all 
+      the members of $\m{V}\otimes \m{S}$. But $u_i \otimes v_j \in \big\{ b_v 
+      \otimes b_s \mid b_v\in \cl{B}_{\m{V}} \text{ and } b_s\in \cl{B}_{\m{S}} \big\}$.
+      Since the elements of $\m{V}\otimes \m{S}$ can be expressed as linear combinations
+      of the basis described above, this fact implies that the claim holds.\\
+
+      The only $a_{ij}$ that could produce the 0-vector would be $0$ itself.\\
+    \end{claimproof}
+  \end{claim}
+  The dimension of $\m{V}\otimes \m{S}$ is given by $dim(\m{V})*dim(\m{S})$
+  
+  \part Let $R: \m{V} \to \m{A}$ and $T:\m{S}\to \m{B}$ be linear functions.
+  Suppose that $\m{A}$, $\m{V}$, and $\m{S}$ have ordered bases the same as
+  in the previous question and that $\m{B}$ has ordered basis
+  $\cl{B}_{\m{B}} = \big\{ b_1, b_2 \big\}$ and that the matrix
+  representations of $R$ and $T$ relative to these bases are
+  \[
+    (R)_{\cl{B}_{\m{V}}\to \cl{B}_{\m{A}} }
+      = \bmat{ -1 &  2 & -1 \\
+                3 & -2 & -1 }
+    \qquad\text{and}\qquad
+    (T)_{\cl{B}_{\m{S}}\to \cl{B}_{\m{B}} }
+      = \bmat{ -2 &  1 \\
+                1 & -2 }.
+  \]
+  Using the lexicographic order for the basis $\cl{B}_{\m{V}\otimes \m{S}}$,
+  find the matrix representation for $(R\otimes T)$ (that is, find
+  $(R\times T)_{\cl{B}_{\m{V}\otimes \m{S}}\to \cl{B}_{\m{A}\otimes \m{B}} }$).
+  [\emph{Hint: Kronecker product.}]
+  \sol
+  We will take the Kronecker product of the two matricies to produce a new matrix:
+  \[
+    (R\times T)_{\cl{B}_{\m{V}\otimes \m{S}}\to \cl{B}_{\m{A}\otimes \m{B}} }
+    =
+    (R)_{\cl{B}_{\m{V}}\to \cl{B}_{\m{A}}} \otimes (T)_{\cl{B}_{\m{S}}\to \cl{B}_{\m{B}}} 
+    =
+    \bmat{
+      2 & -1 & -4 & 2 & 2 & -1\\
+      -1 & 2 & 2 & -4 & -1 & 2\\
+      -6 & 3 & 4 & -2 & 2 & -1\\
+      3 & -6 & -2 & 4 & -1 & 2\\
+    }
+  \]
+\end{parts}
+%----------------------------------------------------------------------------}}}1
+\end{questions} \end{document}

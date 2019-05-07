@@ -1,0 +1,269 @@
+\documentclass{exam} % {{{1
+\usepackage{amsmath, amssymb, amsthm, enumitem, float, caption, mathtools, tikz}
+\usepackage{stackengine}
+
+\usetikzlibrary{arrows, calc, decorations.markings, matrix, positioning}
+\tikzset{>=latex}
+
+% mathbb and mathcal symbols
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\m}[1]{\mathbb{#1}}    % for models
+\newcommand{\cl}[1]{\mathcal{#1}}  % for classes
+
+% theorems and similar environments
+\theoremstyle{plain}
+  \newtheorem{thm}{Theorem}[section]  \newtheorem*{thm*}{Theorem}
+  \newtheorem{claim}[thm]{Claim}      \newtheorem*{claim*}{Claim}
+  \newtheorem{conj}[thm]{Conjecture}  \newtheorem*{conj*}{Conjecture}
+  \newtheorem{cor}[thm]{Corollary}    \newtheorem*{cor*}{Corollary}
+  \newtheorem{lem}[thm]{Lemma}        \newtheorem*{lem*}{Lemma}
+  \newtheorem{prop}[thm]{Proposition} \newtheorem*{prop*}{Proposition}
+\theoremstyle{definition}
+  \newtheorem{defn}[thm]{Definition} \newtheorem*{defn*}{Definition}
+  \newtheorem{ex}[thm]{Example}      \newtheorem*{ex*}{Example}
+\theoremstyle{remark}
+  \newtheorem{rk}[thm]{Remark}  \newtheorem*{rk*}{Remark}
+\newcommand{\Case}[1]{\smallskip \textbf{Case #1:}}
+\newenvironment{claimproof} {
+  \begin{proof}[Proof of claim]
+  \renewcommand{\qedsymbol}{\ensuremath{\bullet}}
+  } {
+  \end{proof}
+  }
+
+% custom commands
+\DeclareMathOperator{\Cg}{Cg}
+\DeclareMathOperator{\Clo}{Clo}
+\DeclareMathOperator{\Con}{Con}
+\DeclareMathOperator{\Rel}{Rel}
+\DeclareMathOperator{\Sg}{Sg}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\bmat}[1]{ \begin{bmatrix} #1 \end{bmatrix} }
+\newcommand{\Bmat}[1]{ \begin{Bmatrix} #1 \end{Bmatrix} }
+\newcommand{\pmat}[1]{ \begin{pmatrix} #1 \end{pmatrix} }
+\newcommand{\mat}[1]{ \begin{matrix} #1 \end{matrix} }
+\newcommand{\vect}[1]{ \left< #1 \right> }
+\newcommand{\ds}[1]{ \displaystyle{#1} }
+\newcommand{\stack}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% misc
+\pagestyle{foot} \cfoot{\thepage}  % page numbering
+\numberwithin{equation}{section}  % number equations within sections
+\renewcommand{\d}{\;d}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\newcommand{\TODO}[1]{\noindent\textbf{TODO: #1}}
+
+% exam documentclass settings
+% restyle parts and subparts
+\renewcommand{\thepartno}{\roman{partno}}
+\renewcommand{\thesubpart}{\alph{subpart}}
+\renewcommand{\subpartlabel}{(\thesubpart)}
+\renewcommand{\subsubpartlabel}{(\thesubsubpart)}
+% restyle multiple choice options
+\renewcommand{\choicelabel}{\thechoice)}
+% true or false questions (use \TFQuestion)
+\newcommand{\TrueFalse}{\hspace*{0.25em}\textbf{True}\hspace*{1.25em}\textbf{False}\hspace*{1em}}
+\newlength{\mylena} \newlength{\mylenb} \settowidth{\mylena}{\TrueFalse}
+\newcommand{\TFQuestion}[1]{
+  \setlength{\mylenb}{\linewidth} 
+  \addtolength{\mylenb}{-121.15pt}
+  \parbox[t]{\mylena}{\TrueFalse}\parbox[t]{\mylenb}{#1}
+}
+
+% document specific stuff
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\texttt{P}}
+\newcommand{\NP}{\texttt{NP}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\bvect}[1]{ \left< #1 \right| }
+\newcommand{\kvect}[1]{ \left| #1 \right> }
+\newcommand{\bracket}[2]{ \left< #1 \mid #2 \right> }
+\newcommand\ooplus{\stackMath\mathbin{\stackinset{c}{0ex}{c}{0ex}{\oplus}{\bigcirc}}}
+\newcommand\shortspace{\hspace{0.25em}}
+%----------------------------------------------------------------------------}}}1
+
+\begin{document}  
+\printanswers
+% title header {{{
+\title{Quantum Algorithms \\ Homework 7 Solutions}
+\author{Patrick Canny}
+\date{Due: 2019-03-26}
+\maketitle
+\thispagestyle{foot}
+%----------------------------------------------------------------------------}}}
+\section{Book Problems}
+\begin{questions}
+  \question Exercise 8.7\\Prove Properties 8.10-8.13 of the operator norm.\\
+  \begin{solution}
+    \begin{parts}
+      \part $||XY|| \leq ||X||\shortspace||Y||$
+      \begin{proof}
+        We know that $||X||$ is given by 
+        \[
+          ||X|| = 
+          \sup_{\kvect{\xi}\neq0}\frac{||X\kvect{\xi}||}{||\kvect{\xi}||}
+        \]
+        So it follows that $||X||\shortspace||Y||$ can be given by
+        \[
+          ||X||\shortspace||Y|| = 
+          \sup_{\kvect{\xi}\neq0}\frac{||X\kvect{\xi}||}{||\kvect{\xi}||}
+          \shortspace
+          \sup_{\kvect{\xi}\neq0}\frac{||Y\kvect{\xi}||}{||\kvect{\xi}||}
+        \]
+        but $||XY||$ is given by
+        \[
+          ||XY|| = 
+          \sup_{\kvect{\xi}\neq0}\frac{||XY\kvect{\xi}||}{||\kvect{\xi}||}
+        \]
+        Take $\kvect{\xi}$ to be the vector that maximizes the norm, i.e. 
+        $||\kvect{\xi}||=1$.
+        The following inequality can be established:
+        \begin{align*}
+          ||XY||\leq
+          ||XY\kvect{\xi}||
+          &\leq ||X(Y\kvect{\xi})||\\
+          &\leq \frac{||X(Y\kvect{\xi})||}{||Y\kvect{\xi}||} \leq ||X||\\
+          &\leq ||X||\shortspace||Y\kvect{\xi}||\\
+        \end{align*}
+        At each step we utilized a constant factor for $\xi$, whose norm will 
+        be the same in each computation. So, we can establish the following 
+        chain of inequalities:
+        \begin{align*}
+          ||XY|| 
+          \leq ||XY\kvect{\xi}||
+          \leq ||X||\shortspace||Y\kvect{\xi}||
+          \leq ||X||\shortspace||Y||
+        \end{align*}
+      \end{proof}
+      \part $||X^\dagger|| = ||X||$
+      \begin{proof}
+        It is known that the largest eigenvalue of $X^\dagger X = 
+        ||X||^2$ (page 72 in the text).\\
+        Define $M = X^\dagger$. It then follows that
+        \begin{align*}
+          ||M||^2 &= \max\{\lambda \shortspace | \lambda \text{ is an 
+          eigenvalue of } M^\dagger M\}\\
+          \implies
+          ||X^\dagger||^2 &= \max\{\lambda \shortspace | \lambda \text{ is an 
+          eigenvalue of } {X^\dagger}^\dagger X^\dagger\}\\
+          &= \max\{\lambda \shortspace | \lambda \text{ is an 
+          eigenvalue of } XX^\dagger\}
+        \end{align*}
+        so it holds that $||X||^2 = ||X^\dagger||^2$ if $X^\dagger X 
+        = XX^\dagger$, or that $X^\dagger X, XX^\dagger$ share the
+        same nonzero set of eigenvalues (since we picked $\lambda$ to be 
+        the largest of the set of these eigenvalues)\\
+
+        Book problem 6.4 asserts that the eigenvalues of $X^\dagger X$ 
+        are the same as the eigenvalues of $XX^\dagger$, so the two sets
+        must have the same maximum. The assertion of problem 6.4 has a 
+        proof that can be seen on page 204 of the text. Since this
+        proves the assertion above, it proves item (ii).
+      \end{proof}
+      \part $||X \otimes Y || = ||X||\shortspace||Y||$
+      \begin{proof}
+        First, define operator $\Gamma$ to be $X \otimes Y$.\\
+        Note that $X:A\rightarrow V$, $Y:B\rightarrow W$.\\
+        Take $K$ to be in $A\otimes B$. Then:\\
+        \begin{align*}
+          ||X\otimes Y||
+          &= \sup_{\kvect{\xi} \neq 0}\frac{||\Gamma\kvect{K}||}{||K||}\\
+          &= \frac{\sqrt{\bracket{\xi}{\xi}}}
+                  {\sqrt{\bracket{K}{K}}} \quad \text{ where $\xi$ is the
+                  result of $\Gamma\kvect{K}$ that is $\sup$}\\
+          &= \frac{\sqrt{\bracket{\sum_{j,k} \lambda^*\mu^*\bvect{e_j\otimes 
+          f_k}}{\sum_{l,m} \lambda\mu\kvect{e_l\otimes f_m}}}}
+                  {\sqrt{\bracket{K}{K}}}
+                  \quad e_{j,l}\in \cl{B}_V, f_{k, m}\in \cl{B}_W\\
+          &= \frac{\sqrt{\bracket{X\alpha}{X\alpha}\bracket{Y\beta}{Y\beta}}}
+                  {\sqrt{\bracket{\alpha}{\alpha}\bracket{\beta}{\beta}}}
+                  \quad \alpha \in A, \beta \in B\\
+          &= \frac{\sqrt{\bracket{X\alpha}{X\alpha}}
+                   \sqrt{\bracket{Y\beta}{Y\beta}}}
+                  {\sqrt{\bracket{\alpha}{\alpha}}
+                  \sqrt{\bracket{\beta}{\beta}}}\\
+          &= \frac{||X\kvect{\alpha}||\shortspace||Y\kvect{b}||}
+                  {||\alpha||\shortspace||\beta||}\\
+          &= ||X||\shortspace||Y||\\
+        \end{align*}
+        So, this proves item (iii).
+      \end{proof}
+      \part $||U|| = 1$
+      \begin{center}
+        (over)
+      \end{center}
+      \begin{proof}
+        First, introduce vector $\kvect{\xi}$ as the vector that maximizes
+        the norm:
+        \begin{align*}
+          ||U|| &= \frac{||U\kvect{\xi}||}{\kvect{\xi}}\\
+          &= \frac{\sqrt{\bracket{U\xi}{U\xi}}}{\sqrt{\bracket{\xi}{\xi}}}\\
+          &= \frac{\sqrt{\bvect{\xi}U^{\dagger}U\kvect{\xi}}}
+          {\sqrt{\bracket{\xi}{\xi}}}\\
+          &= \frac{\sqrt{\bracket{\xi}{\xi}}}
+          {\sqrt{\bracket{\xi}{\xi}}}\\
+          &= 1
+        \end{align*}
+        Note that the property $U^{\dagger}U = I$ is utilized in this proof,
+        this fact has been previously utilized and proven (specifically
+        Quiz 5). This proves item (iv).
+      \end{proof}
+    \end{parts}
+  \end{solution}
+  \question Exercise 8.8\\Prove the two basic properties of approximation i
+  with ancillas:
+  \begin{parts}
+    \part If $\tilde{U}$ approximates $U$ with precision $\delta$, then 
+    $\tilde{U}^{-1}$ approximates $U^{-1}$ with the same precision $\delta$
+    \part If unitary operators $\tilde{U_k}$ approximate unitary operators $U_k$
+    $(1\leq k \leq L)$ with precision $\delta_k$, then $\tilde{U_L}\hdots 
+    \tilde{U_1}$ approximates $U_L\hdots U_1$ with precision $\sum_k \delta_k$
+  \end{parts}
+  \begin{solution}
+    \begin{parts}
+      \part
+      \begin{proof}
+        We can use the fact that
+        \[
+          ||\tilde{U}V - UV|| \leq \delta
+        \]
+        In order to show that this can hold for $\tilde{U^{-1}}$, the 
+        above expression must be recreated using $U$ and $\tilde{U^{-1}}$:
+        \[
+          ||U^{-1}V - V\tilde{U}^{-1}|| \leq \delta
+        \]
+        so multiply the original expression on either side by the norms of
+        the two inverse unitary matrices.
+        \begin{align*}
+          ||\tilde{U}V-UV|| 
+          &= ||\tilde{U}^{-1}||\shortspace||\tilde{U}V-VU||\shortspace||U^{-1}||\\
+          &= ||\tilde{U}^{-1}V\tilde{U}U^{-1}-\tilde{U}^{-1}UU^{-1}||\\
+          &= ||IU^{-1}V-V\tilde{U}^{-1}I||\\
+          &= ||U^{-1}V-V\tilde{U}^{-1}|| \leq \delta\\
+        \end{align*}
+      \end{proof}
+      \part
+      \begin{proof}
+        To show that the errors propagate linearly, we can consider a concrete
+        example of the propagation since it is a fact that the product of 
+        unitary matrices is also unitary. Take $L = 2$:
+        \begin{align*}
+          ||\tilde{U}_2\tilde{U}_1 - U_2U_1||
+          &= ||\tilde{U}_2(\tilde{U}_1V-VU_1)+(\tilde{U}_2V-VU_2)U_1||\\
+          &\leq ||\tilde{U}_2(\tilde{U}_1V-VU_1)||+||(\tilde{U}_2V-VU_2)U_1||\\
+          &\leq ||\tilde{U}_2||\shortspace||(\tilde{U}_1V-U_1)||
+          +||(\tilde{U}_2V-VU_2)||\shortspace||U_1||\\
+          &= ||(\tilde{U}_1V-VU_1)||+||(\tilde{U}_2V-VU_2)|| \leq 
+          \delta_1 + \delta_2
+        \end{align*}
+      \end{proof}
+    \end{parts}
+  \end{solution}
+\end{questions}
+\end{document}
